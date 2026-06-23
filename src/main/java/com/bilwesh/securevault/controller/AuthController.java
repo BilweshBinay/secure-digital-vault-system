@@ -1,5 +1,6 @@
 package com.bilwesh.securevault.controller;
 
+import com.bilwesh.securevault.dto.AuthResponse;
 import com.bilwesh.securevault.dto.LoginRequest;
 import com.bilwesh.securevault.dto.RegisterRequest;
 import com.bilwesh.securevault.entity.User;
@@ -23,8 +24,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public User login(@RequestBody LoginRequest request){
-        System.out.println("Invalid Password");
+    public AuthResponse login(@RequestBody LoginRequest request){
         return userService.loginUser(request);
     }
 }
