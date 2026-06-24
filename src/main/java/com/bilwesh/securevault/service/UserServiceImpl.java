@@ -6,6 +6,7 @@ import com.bilwesh.securevault.dto.AuthResponse;
 import com.bilwesh.securevault.entity.Role;
 import com.bilwesh.securevault.entity.User;
 import com.bilwesh.securevault.repository.UserRepository;
+import com.bilwesh.securevault.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
