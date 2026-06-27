@@ -6,6 +6,8 @@ import com.bilwesh.securevault.dto.AuthResponse;
 import com.bilwesh.securevault.dto.UserProfileResponse;
 import com.bilwesh.securevault.entity.Role;
 import com.bilwesh.securevault.entity.User;
+import com.bilwesh.securevault.exception.InvalidCredentialsException;
+import com.bilwesh.securevault.exception.UserNotFoundException;
 import com.bilwesh.securevault.repository.UserRepository;
 import com.bilwesh.securevault.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +43,10 @@ public class UserServiceImpl implements UserService{
     @Override
     public AuthResponse loginUser(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
-            throw new RuntimeException("Invalid  Password");
+            throw new InvalidCredentialsException("Invalid  Password");
         }
 
         String token = jwtService.generateToken(
@@ -61,7 +63,7 @@ public class UserServiceImpl implements UserService{
 
         String email = authentication.getName();
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found!"));
+                .orElseThrow(() -> new UserNotFoundException("User not found!"));
 
         return new UserProfileResponse(
                 user.getName(),
