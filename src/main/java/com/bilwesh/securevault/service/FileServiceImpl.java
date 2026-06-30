@@ -6,7 +6,9 @@ import com.bilwesh.securevault.entity.User;
 import com.bilwesh.securevault.exception.UserNotFoundException;
 import com.bilwesh.securevault.repository.FileRepository;
 import com.bilwesh.securevault.repository.UserRepository;
+import org.springframework.core.io.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.UrlResource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -98,5 +103,32 @@ public class FileServiceImpl implements FileService {
             response.add(fileResponse);
         }
         return response;
+    }
+
+    @Override
+    public Resource downloadFile(Long id) throws MalformedURLException {
+        FileEntity file = fileRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("File not found"));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String email = authentication.getName();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (!file.getUser().getId().equals(user.getId())){
+            throw  new RuntimeException("Access Denied");
+        }
+
+        Path path = Paths.get(file.getFilePath());
+
+        Resource resource = new UrlResource(path.toUri());
+
+        if (!resource.exists()) {
+            throw new RuntimeException("File not found");
+        }
+
+        return resource;
     }
 }
