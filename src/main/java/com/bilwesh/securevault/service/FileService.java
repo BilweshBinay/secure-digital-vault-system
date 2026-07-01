@@ -12,4 +12,5 @@ public interface FileService  {
     void uploadFile(MultipartFile file) throws IOException;
     List<FileResponse> getMyFile();
     Resource downloadFile(Long id) throws MalformedURLException;
+    void deleteFile(Long id) throws IOException;
 }

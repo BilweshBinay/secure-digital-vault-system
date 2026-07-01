@@ -47,4 +47,10 @@ public class FileController {
                 "attachment; filename=\""+ resource.getFilename()+"\"")
                 .body(resource);
     }
+
+    @DeleteMapping("/{id}")
+    public String deleteFile(@PathVariable long id) throws IOException {
+        fileService.deleteFile(id);
+        return "File deleted successfully";
+    }
 }

@@ -131,4 +131,32 @@ public class FileServiceImpl implements FileService {
 
         return resource;
     }
+
+    @Override
+    public void deleteFile(Long id) throws IOException {
+        FileEntity file = fileRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("File not found"));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String email = authentication.getName();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (!file.getUser().getId().equals(user.getId())){
+            throw new RuntimeException("Access Denied");
+        }
+
+        File physicalFile = new File(file.getFilePath());
+
+        if(!physicalFile.exists()){
+            throw new RuntimeException("File not found");
+        }
+
+        if (!physicalFile.delete()) {
+            throw new RuntimeException("Physical file could not be deleted");
+        }
+        fileRepository.delete(file);
+    }
 }
